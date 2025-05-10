@@ -1,0 +1,7 @@
+openai
+langchain
+pyyaml
+rich
+python-dotenv
+tiktoken
+streamlit

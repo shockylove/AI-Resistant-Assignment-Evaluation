@@ -1,0 +1,24 @@
+title: AI-Resistant Assignment Rubric
+criteria:
+  retrievability:
+    weight: 25
+    desc: >
+      Answer can be directly retrieved from publicly available sources
+      without context constraints (e.g., via web search).
+  templatedness:
+    weight: 20
+    desc: >
+      Response follows a highly generic formulaic structure lacking
+      specific context (e.g., a five-paragraph essay with no proper names).
+  context_dependence:
+    weight: 20
+    desc: >
+      Does not require integration of real-world context or personal experience.
+  counterfactual_need:
+    weight: 20
+    desc: >
+      Does not demand counterfactual reasoning, evaluation, or hypothesis.
+  process_orientation:
+    weight: 15
+    desc: >
+      Does not require submission of intermediate work (drafts, outlines).
