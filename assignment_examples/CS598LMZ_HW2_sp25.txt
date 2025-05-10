@@ -1,0 +1,140 @@
+HW2: Code Generation and Prompting
+CS598LMZ Spring 2025
+
+1 Goal
+In this homework you will practice advanced prompting and automated code‑generation techniques
+to solve data‑structure/algorithm tasks. You will (1) design prompts that coax an LLM to write
+correct, efficient code; (2) automatically test generated solutions; and (3) analyze failure modes
+to iterate on prompt quality.
+
+2 Files
+  • hw2_runner.py………………… driver that loads tasks, calls your prompt, executes LLM output
+  • tasks/………………………………… JSON descriptions of coding problems (name, spec, tests)
+  • grader.py………………………… simple unit‑test harness used by hw2_runner
+  • README.md……………………… setup instructions, LLM API key env vars
+
+3 Setup
+Python 3.9+ and pip are required. Create a virtualenv, then:
+    pip install ‑r requirements.txt
+This installs OpenAI >=1.25.0, PyYAML, pytest, rich.  **Important:** set OPENAI_API_KEY in
+your shell (or edit hw2_runner.py to point at a different provider).
+
+4 Running
+    python hw2_runner.py ‑‑task two_sum
+The script will:
+  1. Load the JSON task
+  2. Insert the spec into your prompt template
+  3. Call the LLM
+  4. Write the returned code to tmp/solution.py
+  5. Execute grader.py on that file
+  6. Print pass/fail + errors
+
+Use ‑‑task all to run every problem. Logs go to tmp/run.log.
+
+5 Prompt Template
+Edit prompt.txt.  It is concatenated with the task’s “spec” field before sending.  You may use
+placeholders like {{solution_signature}} which will be filled by hw2_runner.  **Tip:** few‑shot
+examples of correct I/O are powerful. Explain required complexity; ask the model to reason
+step‑by‑step.
+
+6 Evaluation
+Your grade = (# passed tests) / (total).  Each task has hidden edge‑cases.  Partial credit is
+possible.   Submit:
+    prompt.txt
+    any helper .py you import
+    A short report (<1 page) summarizing your prompt iterations and insights.
+7 Tasks
+| name            | function signature                      | difficulty |
+|-----------------|-----------------------------------------|------------|
+| two_sum         | def two_sum(nums: List[int], target: int) -> Tuple[int,int] | easy    |
+| is_palindrome   | def is_palindrome(s: str) -> bool                       | easy    |
+| k_smallest      | def k_smallest(nums: List[int], k:int)->List[int]       | medium  |
+| can_finish      | def can_finish(n:int, prereq:List[Tuple[int,int]])->bool| medium  |
+| num_islands     | def num_islands(grid:List[List[str]])->int              | medium  |
+| word_ladder_len | def ladder_length(begin: str, end:str, wordList:List[str])->int | hard |
+
+Feel free to add extra tasks for your own experimentation; they will not be graded.
+
+8 Autograder Interface
+Each task JSON has:
+{
+  "name": "two_sum",
+  "signature": "def two_sum(nums: List[int], target: int) -> Tuple[int,int]",
+  "spec": "Return indices of two numbers such that they add to target. 1‑based.",
+  "tests": [
+    {"input": [[2,7,11,15],9],           "expect": [1,2]},
+    {"input": [[3,2,4],6],               "expect": [2,3]},
+    {"input": [[3,3],6],                 "expect": [1,2]}
+  ]
+}
+
+grader.py imports the generated solution, then runs each test’s input via eval(*args).  
+Raise exceptions for invalid assumptions; they will be surfaced.
+
+9 Prompt‑Engineering Advice
+ • State constraints explicitly (e.g., O(n log n)).  
+ • Remind the model to include `from typing import *`.  
+ • Ask it to write exhaustive unit tests first (test‑driven) then code.  
+ • If generation is flaky, sample temperature ≤ 0.2 and n=3, pick best.  
+ • Chain‑of‑thought (“Let’s think step by step”) often improves correctness.  
+ • For hard tasks, allow the model to plan in pseudocode, then translate.
+
+10 Common Failure Modes
+ • Returns wrong index base (0 vs 1)  
+ • Mutable default arguments  
+ • Missing edge cases (empty list, k > len(nums))  
+ • Infinite recursion depth  
+ • Using libraries that are disallowed (e.g., numpy) – runner strips network/FS
+
+When a test fails, read tmp/solution.log to see traceback and LLM token usage.
+
+11 Rubric for the Report (20 pts)
+ • Prompt quality (clarity, reuse, comments)………………… 8 pts  
+ • Iteration analysis (what failed, how improved)……… 8 pts  
+ • Insights / lessons……………………………………… 4 pts
+
+12 Academic Integrity
+You may discuss ideas with classmates but must write your own prompt and report.
+Do **not** post the tasks publicly nor share your API key.  
+We will run plagiarism checks on prompt.txt.
+
+13 Extra Credit (+5 pts)
+Implement an automatic retry agent: if the first generation fails tests, analyze the
+error message and ask the LLM to patch only the bug.  Show before/after diff in logs.
+
+14 FAQ
+Q: Can I cache completions?  
+A: Yes. hw2_runner caches by (task‑name, prompt‑hash) in .cache/. Delete to rerun.
+
+Q: My model times out.  
+A: Reduce max_tokens or split the task spec into smaller context windows.
+
+Q: May I fine‑tune a smaller model instead of GPT‑4o?  
+A: Allowed, but you are responsible for comparable accuracy.
+
+Q: How big is the hidden test set?  
+A: 3–10 cases per task.
+
+Join the Piazza forum for Q&A; tag posts “HW2”.
+
+15 Submission
+Due : March 7, 2025 @ 23:59 US Central.
+Submit on Gradescope:
+  • prompt.txt
+  • any .py helpers
+  • report.pdf  (combine iterations + insights)
+
+Late policy : –10% per day, max 3 days.
+
+16 Grading Environment Version
+  • Python 3.11.3  
+  • openai‑python 1.25.1  
+  • pytest 8.2.0  
+  • Ubuntu 22.04 (no internet)
+
+Your code must run with these versions.
+
+17 Citation
+If you use external resources (papers, blogs) to craft prompts, cite them in the report.
+
+Good luck, and happy prompt‑engineering!

@@ -17,7 +17,7 @@ def generate_redesign_suggestions(assignment_text: str, analysis: dict, assessme
     Use the evaluation analysis and assessment weaknesses to propose redesign suggestions.
     Returns a markdown-formatted string with three suggestions, each with rationale and an example.
     """
-    llm = ChatOpenAI(model="grok3", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    llm = ChatOpenAI(model="grok-3-mini-beta", openai_api_key=os.getenv("OPENAI_API_KEY"))
     prompt = (
         "You are an instructional designer. Given the original assignment prompt and the following analysis:\n\n"
         f"Assignment Prompt:\n{assignment_text}\n\n"
